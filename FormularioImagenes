@@ -1,0 +1,54 @@
+'Creado por Pablo Sanz Martín 2019 para la Biblioteca de la ETSIT UPM
+'
+
+Private Sub CommandButton1_Click()
+'
+'Este script gestiona las acción de hacer click en el formulario dado
+'
+    
+
+    Dim Box1 As Integer
+    Dim Box2 As Integer
+
+    'En primer lugar comprobamos algunos datos
+    If TextBox1 = "" Then
+        MsgBox "El número inicial está en blanco"
+        Exit Sub
+    End If
+    If TextBox2 = "" Then
+     MsgBox "El número final está en blanco"
+        Exit Sub
+    End If
+
+    'Dado que se introducen datos String (texto), los transformamos en Integer (números)
+    Box1 = TransText(TextBox1)
+    Box2 = TransText(TextBox2)
+
+    'Estos valores vienen de TransText cuando da error por tipo incorrecto de datos
+    If Box1 = 17015 Then
+      MsgBox "No se pueden introducir letras ni caracteres no admitidos"
+       Exit Sub
+    End If
+    If Box2 = 17015 Then
+       MsgBox "No se pueden introducir letras ni caracteres no admitidos"
+       Exit Sub
+    End If
+    'esta comprobacion permite asegurarnos de que el valor inicial sea menor al final, si se elmina aquí y en BuscaImagenes y se invierten los valores dados, se borran las imagenes en el rango marcado
+    If Box2 < Box1 Then
+       MsgBox "El número de registro final es menor que el inicial"
+       Exit Sub
+    End If
+    
+    If (Box2 - Box1) > 100 Then
+        MsgBox "No se pueden actualizar más de 100 elementos por vez"
+        Exit Sub
+    Else
+        
+    'Llamamos al método que realiza las acciones correspondientes con cada imagen en cada celda
+    Call BuscaImagenes(Box1, Box2)
+    Unload Me 'descargamos las variables antes de salir
+ End If
+
+End Sub
+
+
