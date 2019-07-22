@@ -1,0 +1,29 @@
+'Con estos métodos gestionamos las carpetas desde las que los programas trabajarán.
+
+Private Sub CommandButton1_Click()
+    
+    MsgBox ("A continuación selecciona la carpeta de iconos.")
+    
+    Worksheets("Ajustes").Range("E9").Value = GetFolder()
+    
+    MsgBox ("Por último selecciona la carpeta de las imágenes que se abriran al hacer click en un icono.")
+    
+    Worksheets("Ajustes").Range("E12").Value = GetFolder()
+End Sub
+
+Private Sub CommandButton2_Click()
+    Worksheets("Ajustes").Range("E19").Value = GetFolder()
+End Sub
+
+Private Sub CommandButton3_Click()
+    
+    
+    Worksheets("Ajustes").Range("E9").Value = Worksheets("Ajustes").Range("D39").Value
+    Worksheets("Ajustes").Range("E12").Value = Worksheets("Ajustes").Range("D40").Value
+    
+    
+End Sub
+
+Private Sub CommandButton4_Click()
+    Worksheets("Ajustes").Range("E19").Value = Worksheets("Ajustes").Range("D41").Value
+End Sub
