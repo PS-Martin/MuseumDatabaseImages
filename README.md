@@ -1,7 +1,9 @@
 # MuseumDatabaseImages
-Macro to organize and maniulate pictures inside a museum database. The instructions are in Spanish: contact me for further info or a request of a translation.
+Macro to organize and maniulate pictures and links to files inside a museum database. The instructions are in Spanish: contact me for further info or a request of a translation.
 
+::::::::::::::::::::::::::::
 INSTRUCCIONES PARA EL USO DEL PROGRAMA DE ACTUALIZACIÓN DE ICONOS DEL INVENTARIO DEL MUSEO
+::::::::::::::::::::::::::::
 
 	Este programa está diseñado para funcionar aplicado a la base de datos del inventario de la biblioteca de la ETSIT-UPM. Para ejecutarse en otros excels requeriría adaptar el código.
 
@@ -35,3 +37,27 @@ Ante este tipo de errores, o si el programa no realizara las acciones solicitada
 —Las imágenes existen en cada carpeta (carpetas: 2_Retocadas y 4_Iconos) Y han sido nombradas correctamente siguiendo las mismas pautas que todas las demás (ej: MUSEO 00991_1.jpg)
 
 —No hay números de registro en blanco en el libro Excel de identificación a lo largo del rango dado: es decir, si se actualizan por ejemplo las 50 primeras piezas, debe figurar el número de registro en todas ellas. Si un solo número no está en la columna en el rango dado, el programa se detendrá:
+
+
+::::::::::::::::::::
+INSTRUCCIONES PARA EL USO DEL PROGRAMA DE ACTUALIZACIÓN ENLACES A FICHAS DEL MUSEO
+::::::::::::::::::::
+
+	Este programa permite actualizar automáticamente hasta 50 elementos en la columna de “Acceso Ficha” en el libro IDENTIFICACIÓN del inventario. Al ejecutarlo se rellenan las filas correspondientes a las piezas seleccionadas de esa columna, con los enlaces activos a sus respectivas fichas.
+	Tras hacer click en “iniciar”, puede tardar unos segundos en comenzar, ya que debe recorrer todas las fichas antes de seleccionar las adecuadas.
+	Para ello basta con hacer click en el botón “Actualizar Links”
+Cuando no se encuentre ficha, se dejará en blanco la celda, y se advertirá al usuario de ello, pausando el programa.
+A partir de ahí el proceso es análogo al programa que gestiona los iconos, pero el funcionamiento interno es distinto, por lo que asegurar que funciona correctamente tiene sus propias reglas.
+LIMITACIONES DEL PROGRAMA
+(Ver limitaciones del programa de Iconos)
+
+ADVERTENCIA PARA EL CORRECTO FUNCIONAMIENTO DEL PROGRAMA
+	Sobre el tratamiento de errores el proceder es análogo al de iconos.
+	Para evitar problemas debemos asegurarnos de que las fichas se encuentran en la carpeta indicada. De lo contrario el programa nos advertirá de ello. 
+	—Las fichas debe tener todas un nombre tal que comience así: “MUSEO XX.XXX-[…]”, siendo XX.XXX el número de pieza correspondiente. Si una ficha no tiene el nombre escrito correctamente siguiendo este patrón, la ficha no será detectada. Nótese el guion incluido, también imprescindible. Lo que se escriba a continuación es irrelevante. Esto admite también fichas de accesorios (XX.XXXa-), siempre con el guion.
+	
+
+ACTUALIZACIÓN
+	Se ha añadido en el excel del Inventario una hoja llamada “Ajustes”.
+	Si por algún motivo se modificara el emplazamiento de las fichas o las imágenes para los iconos, ahí se puede cambiar la carpeta para indicar a los programas la ruta en la que tienen que buscar fichas o imágenes. De esta forma las reglas mencionadas en las instrucciones se aplicarían para las carpetas indicadas por el usuario en ajustes. Para que los ajustes no desaparezcan debe guardarse el archivo de Excel. Si se realiza esto, probablemente se deban actualizar con el programa todos los links e iconos de la ficha para que siguieran siendo válidos haciendo referencia a las nuevas carpetas.
+
