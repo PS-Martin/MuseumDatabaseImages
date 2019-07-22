@@ -1,26 +1,23 @@
 'Creado por Pablo Sanz Martín 2019 para la Biblioteca de la ETSIT UPM
 '
 
+
 Public interruptorSeguridad As Boolean 'esta variable está para detener el programa si su valor es True
 
-Sub Botón4_Haga_clic_en()
-    UserForm1.Show
+
+Sub FormBuscaImagenes()
+    DatosIconos.Show
 End Sub
 
 
 
-
-
-Sub BuscaImagenes(inicio As Integer, fin As Integer)
+Sub BuscaImagenes(inicio As Integer, fin As Integer, serie As String)
 '
 ' ScriptImagenes Macro
 '
 'Este script ordena en una columna una lista de imágenes y les asigna un link hacia otras imágenes relacionadas. Está dividido en 3 bucles que organizan las imágenes en orden en 3 columnas distintas dependiendo de cuántas cifras tenga el número asociado a cada imágen.
 'Sería posible optimizarlo un poco y reducir el número de variables auxiliares, pero puede ser útil para garantizar que no se tocan los datos introducidos y más adelante alterar o incluir alguna funcionalidad.
 'variables auxiliares
-'
-'Creado por Pablo Sanz Martín 2019 para la Biblioteca de la ETSIT UPM
-'
 Dim picDir As String 'variable para gestionar la direccion en carpeta de los iconos
 Dim picLink As String 'variable para gestionar la dirección de los links de cada foto
 Dim ceros As String 'variable auxiliar para añadir los ceros pertinentes a cada imagen de cara a obtener la direccion (es de una version antigua, podria sustituirse por un manejo de TransNum o TransText).
@@ -35,6 +32,9 @@ Dim PicDirE As String
 Dim PicDirF As String
 Dim PicDirG As String
 Dim PicDirH As String
+Dim carpetaIcon As String
+Dim carpetaImag As String
+
 'variables que copian los datos iniciales entregados a este método para trabajar con ellos
 Dim inicioC As Integer
 Dim finC As Integer
@@ -47,7 +47,8 @@ Dim auxCounter As Integer 'counter auxiliar por lo mismo
  inicioC = inicio
  finC = fin
  interruptorSeguridad = False
- 
+ carpetaIcon = Worksheets("Ajustes").Range("E9").Value
+ carpetaImag = Worksheets("Ajustes").Range("E12").Value
 '
 'SCRIPT
 '
@@ -72,7 +73,7 @@ Dim auxCounter As Integer 'counter auxiliar por lo mismo
 
 
  'Después borramos todo lo que haya en el espacio de trabajo
- Call Borrar(inicioC, finC)
+ Call Borrar(inicioC, finC, serie)
  
  If interruptorSeguridad = True Then Exit Sub
 
@@ -83,20 +84,20 @@ Dim auxCounter As Integer 'counter auxiliar por lo mismo
 
     'Ahora asignamos una cantidad de ceros según el número de cifras de cada pieza, pues tendrá distinto nombre a la hora de buscar la imagen
  
-    If 0 < counter Then If counter < 10 Then ceros = "0000"
+    If 0 < counter Then If counter < 10 Then ceros = "00"
 
-    If 9 < counter Then If counter < 100 Then ceros = "000"
+    If 9 < counter Then If counter < 100 Then ceros = "0"
 
-    If 99 < counter Then If counter < 1000 Then ceros = "00"
+    If 99 < counter Then If counter < 10000 Then ceros = ""
        
-    If 999 < counter Then If counter < 10000 Then ceros = "0"
+   ' If 999 < counter Then If counter < 10000 Then ceros = "0"
  
          
-    marcPos = (ObtieneValores(auxCounter)) 'dado que la primera fila es para los títulos de las columnas, comenzamos a "imprimir" la lista a partir de la fila 2 (+1)
+    marcPos = (ObtieneValores(auxCounter, serie)) 'dado que la primera fila es para los títulos de las columnas, comenzamos a "imprimir" la lista a partir de la fila 2 (+1)
     
     Range("C" & (marcPos)).Select  'en esta vuelta de bucle seleccionamos la celda concreta Gx
     
-    picDir = "H:\MUSEO\DIGITOOL\FOTOS\4_Iconos\MUSEO " & ceros & counter & "_1" & ".jpg"  'componemos el nombre de imagen según el cual la buscaremos
+    picDir = carpetaIcon & "\MUSEO " & serie & ceros & counter & "_1" & ".jpg"  'componemos el nombre de imagen según el cual la buscaremos
     
        
     If Dir(picDir) <> "" Then  'comprobamos si existe la imagen a la que hace referencia picDir, y si existe la insertamos y después la reajustamos a la celda con FitPic
@@ -106,7 +107,7 @@ Dim auxCounter As Integer 'counter auxiliar por lo mismo
       ActiveSheet.Pictures.Insert(picDir).Select
       Call FitPict
     Else
-        picDir = "H:\MUSEO\DIGITOOL\FOTOS\4_Iconos\MUSEO " & ceros & counter & "_2" & ".jpg"  'si no existiera, renombramos picDir por si hubiera otra posible y repetimos intento
+        picDir = carpetaIcon & "\MUSEO " & serie & ceros & counter & "_2" & ".jpg"  'si no existiera, renombramos picDir por si hubiera otra posible y repetimos intento
         If Dir(picDir) <> "" Then
             ActiveSheet.Pictures.Insert(picDir).Select
             Call FitPict
@@ -120,12 +121,12 @@ Dim auxCounter As Integer 'counter auxiliar por lo mismo
     'Si no hubiera imagen 1 ni 2 de esa pieza, seguimos adelante.
     
     'repetimos proceso con los links
-    picLink = "H:\MUSEO\DIGITOOL\FOTOS\2_Retocadas\2-Con marca de agua UPM\MUSEO " & ceros & counter & "_1" & ".jpg"
+    picLink = carpetaImag & "\MUSEO " & serie & ceros & counter & "_1" & ".jpg"
     
     If Dir(picLink) <> "" Then
       ActiveSheet.Hyperlinks.Add Anchor:=Selection.ShapeRange.Item(1), Address:=picLink
     Else
-        picLink = "H:\MUSEO\DIGITOOL\FOTOS\2_Retocadas\2-Con marca de agua UPM\MUSEO " & ceros & counter & "_2" & ".jpg"
+        picLink = carpetaImag & "\MUSEO " & serie & ceros & counter & "_2" & ".jpg"
         If Dir(picLink) <> "" Then
         ActiveSheet.Hyperlinks.Add Anchor:=Selection.ShapeRange.Item(1), Address:=picLink
         End If
@@ -134,14 +135,14 @@ Dim auxCounter As Integer 'counter auxiliar por lo mismo
     
 NO_ICONO1:
     
-    PicDirA = "H:\MUSEO\DIGITOOL\FOTOS\4_Iconos\MUSEO " & ceros & counter & "a" & "_1" & ".jpg"
-    PicDirB = "H:\MUSEO\DIGITOOL\FOTOS\4_Iconos\MUSEO " & ceros & counter & "b" & "_1" & ".jpg"
-    PicDirC = "H:\MUSEO\DIGITOOL\FOTOS\4_Iconos\MUSEO " & ceros & counter & "c" & "_1" & ".jpg"
-    PicDirD = "H:\MUSEO\DIGITOOL\FOTOS\4_Iconos\MUSEO " & ceros & counter & "d" & "_1" & ".jpg"
-    PicDirE = "H:\MUSEO\DIGITOOL\FOTOS\4_Iconos\MUSEO " & ceros & counter & "e" & "_1" & ".jpg"
-    PicDirF = "H:\MUSEO\DIGITOOL\FOTOS\4_Iconos\MUSEO " & ceros & counter & "f" & "_1" & ".jpg"
-    PicDirG = "H:\MUSEO\DIGITOOL\FOTOS\4_Iconos\MUSEO " & ceros & counter & "f" & "_1" & ".jpg"
-    PicDirH = "H:\MUSEO\DIGITOOL\FOTOS\4_Iconos\MUSEO " & ceros & counter & "f" & "_1" & ".jpg"
+    PicDirA = carpetaIcon & "\MUSEO " & serie & ceros & counter & "a" & "_1" & ".jpg"
+    PicDirB = carpetaIcon & "\MUSEO " & serie & ceros & counter & "b" & "_1" & ".jpg"
+    PicDirC = carpetaIcon & "\MUSEO " & serie & ceros & counter & "c" & "_1" & ".jpg"
+    PicDirD = carpetaIcon & "\MUSEO " & serie & ceros & counter & "d" & "_1" & ".jpg"
+    PicDirE = carpetaIcon & "\MUSEO " & serie & ceros & counter & "e" & "_1" & ".jpg"
+    PicDirF = carpetaIcon & "\MUSEO " & serie & ceros & counter & "f" & "_1" & ".jpg"
+    PicDirG = carpetaIcon & "\MUSEO " & serie & ceros & counter & "f" & "_1" & ".jpg"
+    PicDirH = carpetaIcon & "\MUSEO " & serie & ceros & counter & "f" & "_1" & ".jpg"
     
     If Dir(PicDirA) <> "" Then
         letraAccesorios = letraAccesorios + 1
@@ -149,7 +150,7 @@ NO_ICONO1:
         ActiveSheet.Pictures.Insert(PicDirA).Select
         Call FitPict
         
-        PicDirA = "H:\MUSEO\DIGITOOL\FOTOS\2_Retocadas\2-Con marca de agua UPM\MUSEO " & ceros & counter & "a" & "_1" & ".jpg"
+        PicDirA = carpetaImag & "\MUSEO " & serie & ceros & counter & "a" & "_1" & ".jpg"
         If Dir(PicDirA) <> "" Then
             ActiveSheet.Hyperlinks.Add Anchor:=Selection.ShapeRange.Item(1), Address:=PicDirA
         End If
@@ -161,7 +162,7 @@ NO_ICONO1:
         ActiveSheet.Pictures.Insert(PicDirB).Select
         Call FitPict
         
-        PicDirB = "H:\MUSEO\DIGITOOL\FOTOS\2_Retocadas\2-Con marca de agua UPM\MUSEO " & ceros & counter & "b" & "_1" & ".jpg"
+        PicDirB = carpetaImag & "\MUSEO " & serie & ceros & counter & "b" & "_1" & ".jpg"
         If Dir(PicDirB) <> "" Then
             ActiveSheet.Hyperlinks.Add Anchor:=Selection.ShapeRange.Item(1), Address:=PicDirB
         End If
@@ -173,7 +174,7 @@ NO_ICONO1:
         ActiveSheet.Pictures.Insert(PicDirC).Select
         Call FitPict
         
-        PicDirC = "H:\MUSEO\DIGITOOL\FOTOS\2_Retocadas\2-Con marca de agua UPM\MUSEO " & ceros & counter & "c" & "_1" & ".jpg"
+        PicDirC = carpetaImag & "\MUSEO " & serie & ceros & counter & "c" & "_1" & ".jpg"
         If Dir(PicDirC) <> "" Then
             ActiveSheet.Hyperlinks.Add Anchor:=Selection.ShapeRange.Item(1), Address:=PicDirC
         End If
@@ -185,7 +186,7 @@ NO_ICONO1:
         ActiveSheet.Pictures.Insert(PicDirD).Select
         Call FitPict
         
-        PicDirD = "H:\MUSEO\DIGITOOL\FOTOS\2_Retocadas\2-Con marca de agua UPM\MUSEO " & ceros & counter & "d" & "_1" & ".jpg"
+        PicDirD = carpetaImag & "\MUSEO " & serie & ceros & counter & "d" & "_1" & ".jpg"
         If Dir(PicDirD) <> "" Then
             ActiveSheet.Hyperlinks.Add Anchor:=Selection.ShapeRange.Item(1), Address:=PicDirD
         End If
@@ -197,7 +198,7 @@ NO_ICONO1:
         ActiveSheet.Pictures.Insert(PicDirE).Select
         Call FitPic
         
-        PicDirE = "H:\MUSEO\DIGITOOL\FOTOS\2_Retocadas\2-Con marca de agua UPM\MUSEO " & ceros & counter & "e" & "_1" & ".jpg"
+        PicDirE = carpetaImag & "\MUSEO " & serie & ceros & counter & "e" & "_1" & ".jpg"
         If Dir(PicDirE) <> "" Then
             ActiveSheet.Hyperlinks.Add Anchor:=Selection.ShapeRange.Item(1), Address:=PicDirE
         End If
@@ -209,7 +210,7 @@ NO_ICONO1:
         ActiveSheet.Pictures.Insert(PicDirF).Select
         Call FitPic
         
-        PicDirF = "H:\MUSEO\DIGITOOL\FOTOS\2_Retocadas\2-Con marca de agua UPM\MUSEO " & ceros & counter & "f" & "_1" & ".jpg"
+        PicDirF = carpetaImag & "\MUSEO " & serie & ceros & counter & "f" & "_1" & ".jpg"
         If Dir(PicDirF) <> "" Then
             ActiveSheet.Hyperlinks.Add Anchor:=Selection.ShapeRange.Item(1), Address:=PicDirF
         End If
@@ -221,7 +222,7 @@ NO_ICONO1:
         ActiveSheet.Pictures.Insert(PicDirG).Select
         Call FitPic
         
-        PicDirG = "H:\MUSEO\DIGITOOL\FOTOS\2_Retocadas\2-Con marca de agua UPM\MUSEO " & ceros & counter & "g" & "_1" & ".jpg"
+        PicDirG = carpetaImag & "\MUSEO " & serie & ceros & counter & "g" & "_1" & ".jpg"
         If Dir(PicDirG) <> "" Then
             ActiveSheet.Hyperlinks.Add Anchor:=Selection.ShapeRange.Item(1), Address:=PicDirG
         End If
@@ -233,7 +234,7 @@ NO_ICONO1:
         ActiveSheet.Pictures.Insert(PicDirH).Select
         Call FitPic
         
-        PicDirH = "H:\MUSEO\DIGITOOL\FOTOS\2_Retocadas\2-Con marca de agua UPM\MUSEO " & ceros & counter & "h" & "_1" & ".jpg"
+        PicDirH = carpetaImag & "\MUSEO " & serie & ceros & counter & "h" & "_1" & ".jpg"
         If Dir(PicDirH) <> "" Then
             ActiveSheet.Hyperlinks.Add Anchor:=Selection.ShapeRange.Item(1), Address:=PicDirH
         End If
@@ -246,7 +247,7 @@ NO_ICONO1:
  Next counter
 
 'ocultamos formulario
-UserForm1.Hide
+DatosIconos.Hide
     
 End Sub
 
@@ -255,8 +256,6 @@ Sub FitPict()
 'FitPic Macro
 '
 'Este script ajusta una imagen a la celda seleccionada priorizando la altura
-'
-'Created by TPortsmouth, published in mrexcell.com => https://www.mrexcel.com/forum/excel-questions/999545-auto-resize-image-excel-merged-cell.html
 '
     On Error GoTo NOT_SHAPE
     Dim PicWtoHRatio As Single
@@ -294,14 +293,13 @@ End Sub
 
 
 
-Sub Borrar(r1 As Integer, r2 As Integer)
+Sub Borrar(r1 As Integer, r2 As Integer, serie As String)
 '
 'Borrar Macro
 '
 'Este permite borrar todas las imágenes de un rango. Desconozco por qué pero puede dar algunos errores (normalmente 13) si en la hoja (quizá solo en el rango) hay imágenes introducidas manualmente.
 '
-'Creado por Pablo Sanz Martín 2019 para la Biblioteca de la ETSIT UPM
-'
+
     Dim s As Picture
     Dim cellRange As String
     Dim CambioIni As String
@@ -319,8 +317,8 @@ Sub Borrar(r1 As Integer, r2 As Integer)
 
     'Dado que a veces hay piezas con accesorios, el rango en número de casillas no es simplemente lo que introduce el usuario: es necesario añadir casillas extra.
     'Por eso generamos primero los identificadores del catalogo correspondientes a las cifras dadas
-    CambioIni = TransNum(AuxR1)
-    CambioFin = TransNum(AuxR2)
+    CambioIni = TransNum(AuxR1, serie)
+    CambioFin = TransNum(AuxR2, serie)
 
 'LOG
 'MsgBox CambioIni
@@ -369,59 +367,60 @@ Sub Borrar(r1 As Integer, r2 As Integer)
 End Sub
 
 
-Function TransNum(aux As Integer) As String
+Function TransNum(aux As Integer, serie As String) As String
 '
 'TransNum Macro
 '
-'Genera el número de inventario a partir del número de pieza (es decir, añadiendo los ceros correspondientes e introduciendo el punto
-'
-'Creado por Pablo Sanz Martín 2019 para la Biblioteca de la ETSIT UPM
+'Genera el número de inventario a partir del número de pieza (es decir, añadiendo los ceros correspondientes e introduciendo el punto.
 '
     Dim valor As String
-    Dim valorRe As String
-    valorRe = "a"
+  '  Dim valorRe As String
+   ' valorRe = "a"
 
     'según el número de cifras asignamos una cantidad de ceros
     If aux < 10 Then valor = "00" & aux
 
     If 9 < aux Then If aux < 100 Then valor = "0" & aux
 
-    If 99 < aux Then If aux < 1000 Then valor = "" & aux
+    If 99 < aux Then If aux < 10000 Then valor = "" & aux
     
     'Despues añadimos el punto en la posición dada.
-    If aux < 1000 Then
-        valor = "00." & valor
-    Else
-        valor = "" & aux
-        If aux < 9999 Then
-            valorRe = Left(valor, 1)
-            valor = valorRe & "." & Right(valor, 3)
-            valor = "0" & valor
-        Else
-            valorRe = Left(valor, 2)
-            valor = valorRe & "." & Right(valor, 3)
+'    If aux < 1000 Then
+        valor = serie & "." & valor
+'    Else
+ '       valor = "" & aux
+ '       If aux < 9999 Then
+  '          valorRe = Left(valor, 1)
+ '           valor = valorRe & "." & Right(valor, 3)
+ '           valor = "0" & valor
+'        Else
+'            valorRe = Left(valor, 2)
+'            valor = valorRe & "." & Right(valor, 3)
             
-        End If
-    End If
+ '       End If
+ '   End If
 
     TransNum = valor
 
 End Function
 
 
-Function TransText(auxi As String) As Integer
+Function TransText(auxi As String, serie As String) As Integer
 '
 'TransText Macro
 '
 'Obtiene un número que puede utilizar el programa para hacer cálculos a partir del número de inventario
 '
-'Creado por Pablo Sanz Martín 2019 para la Biblioteca de la ETSIT UPM
-'
+    
+    
     On Error GoTo FORMATO 'manejo de errores: en principio cuando se introduzcan valores que no se pueden transformar de String a Integer
 
     Dim myString As String 'variable auxiliar
-
-    myString = Replace(auxi, ".", "") 'Con esta instrucción de reemplazo quitamos los puntos de la expresión del número de inventario
+    Dim quitar As String
+    
+    quitar = serie & "."
+    
+    myString = Replace(auxi, quitar, "") 'Con esta instrucción de reemplazo quitamos los puntos de la expresión del número de inventario
 
     TransText = CInt(myString) 'convertimos la expresión final en un número
 
@@ -432,21 +431,19 @@ FORMATO:
 
 End Function
 
-Function ObtieneValores(valor As Integer) As Integer
+Function ObtieneValores(valor As Integer, serie As String) As Integer
 '
 'ObtieneValores Macro
 '
 'Esta función devuelve un número que representa el número de fila de una celda que contiene el número de registro asignado al valor numérico que recibe la función.
 'Es decir: nos permite obtener el número de fila de una pieza dada
 '
-'Creado por Pablo Sanz Martín 2019
-'
     
     
     Dim num As String
     Dim celdilla As Range
     
-    num = TransNum(valor)
+    num = TransNum(valor, serie)
         
     Set celdilla = ActiveSheet.UsedRange.Find(What:=num, LookAt:=xlWhole)
     
@@ -467,24 +464,21 @@ Function ObtieneValores(valor As Integer) As Integer
     
 End Function
 
+    
+    
+Function SerieValor(introd As String) As String
 
+   Dim a As Long
+      
+    a = InStr(introd, ".")
+    
+     
+   If a <> 0 Then
+   
+       SerieValor = Left(introd, 2)
+   Else
+       SerieValor = "00"
+   End If
 
-Function Existe(count As Integer, rev As String, pos As Integer) As Boolean
-'
-'Existe Macro
-'
-'Esta función no se utiliza pero en una versión previa tenía sentido. La dejo aquí por si acaso. La idea (solucionando algún pequeño fallo) es que se asegure de que la pieza seleccionada se corresponde con el identificador de la casilla contigua. En principio no parece relevante ya que lo peor que puede pasar si no se corresponde es que no se incluya la imagen en ese punto, lo cual ya permite identificar fallo.
-'
-'Creado por Pablo Sanz Martín 2019 para la Biblioteca de la ETSIT UPM
-'
-    If TransNum(count) = rev Then
-    Existe = True
+End Function
 
-    Else
-      Range("C" & (pos)).Interior.ColorIndex = 3
-     MsgBox "No hay coincidencia en la pieza" & Range("A" & (pos)).Value
-     Existe = False
-       
-    End If
-
-    End Function
