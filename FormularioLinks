@@ -1,0 +1,78 @@
+Private Sub CommandButton1_Click()
+
+    
+
+    Dim Box1 As Integer
+    Dim Box2 As Integer
+    Dim serie1 As String
+    Dim serie2 As String
+   
+    
+    If Worksheets("Ajustes").Range("E19").Value = "" Then
+        MsgBox "No se encuentra carpeta de FICHAS: revisar ajustes"
+        Exit Sub
+    End If
+    
+
+    'En primer lugar comprobamos algunos datos
+    If TextBox1 = "" Then
+        MsgBox "El número inicial está en blanco"
+        Exit Sub
+    End If
+    If TextBox2 = "" Then
+     MsgBox "El número final está en blanco"
+        Exit Sub
+    End If
+
+    'Dado que se introducen datos String (texto), los transformamos en Integer (números)
+   
+    
+    serie1 = SerieValor(TextBox1)
+    serie2 = SerieValor(TextBox2)
+    
+    If serie1 <> serie2 Then
+        MsgBox "Los elementos pertenecen a series distintas"
+        Exit Sub
+    End If
+  
+    Box1 = TransText(TextBox1, serie1)
+    Box2 = TransText(TextBox2, serie1)
+
+    'Estos valores vienen de TransText cuando da error por tipo incorrecto de datos
+    If Box1 = 17015 Then
+      MsgBox "No se pueden introducir letras ni caracteres no admitidos"
+       Exit Sub
+    End If
+    If Box2 = 17015 Then
+       MsgBox "No se pueden introducir letras ni caracteres no admitidos"
+       Exit Sub
+    End If
+    'esta comprobacion permite asegurarnos de que el valor inicial sea menor al final, si se elmina aquí y en BuscaImagenes y se invierten los valores dados, se borran las imagenes en el rango marcado
+    If Box2 < Box1 Then
+       MsgBox "El número de registro final es menor que el inicial"
+       Exit Sub
+    End If
+    
+    If (Box2 - Box1) > 50 Then
+        MsgBox "No se pueden actualizar más de 50 elementos por vez"
+        Exit Sub
+    Else
+        
+        'Llamamos al método que realiza las acciones correspondientes con cada imagen en cada celda
+        Call Actualinkza(Box1, Box2, serie1)
+        Unload Me 'descargamos las variables antes de salir
+        DatosLinks.Hide
+    End If
+   
+
+
+End Sub
+
+
+Private Sub Label3_Click()
+
+End Sub
+
+Private Sub UserForm_Click()
+
+End Sub
