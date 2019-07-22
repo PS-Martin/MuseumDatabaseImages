@@ -1,0 +1,350 @@
+'Creado por Pablo Sanz Martín 2019 para la Biblioteca de la ETSIT UPM
+'
+
+
+'Mostrar formulario asociado
+Sub FormCambiaLinks()
+    DatosLinks.Show
+End Sub
+
+
+
+
+Sub Actualinkza(inicio As Integer, fin As Integer, serie As String)
+'
+' ScriptImagenes Macro
+'
+'Este script ordena en una columna una lista de imágenes y les asigna un link hacia otras imágenes relacionadas. Está dividido en 3 bucles que organizan las imágenes en orden en 3 columnas distintas dependiendo de cuántas cifras tenga el número asociado a cada imágen.
+'Sería posible optimizarlo un poco y reducir el número de variables auxiliares, pero puede ser útil para garantizar que no se tocan los datos introducidos y más adelante alterar o incluir alguna funcionalidad.
+'variables auxiliares
+    Dim marcPos As Integer 'variable para gestionar la posición de las casillas
+    
+'variables que copian los datos iniciales entregados a este método para trabajar con ellos
+    
+    Dim Rango As Range
+    Dim rangoAux As Range
+    Dim nPieza As String
+    Dim nPiezaBase As String
+
+    Dim auxCounter As Integer 'counter auxiliar por lo mismo
+
+    Dim oFile       As Object
+    Dim oFSO        As Object
+    Dim oFolder     As Object
+    Dim oFiles      As Object
+    Dim Link As String
+    Dim celda As Range
+    Dim ficha As String
+    Dim r1 As String
+    Dim directorio As String
+    Dim listaFichas As String
+    Dim fragmento As String
+    Dim openPos As Long
+    Dim closePos As Long
+    Dim longitud As Long
+    
+    Dim a As Long
+    Dim b As Long
+    Dim c As Long
+    Dim d As Long
+    Dim e As Long
+    Dim f As Long
+    Dim a2 As Long
+    Dim b2 As Long
+    Dim c2 As Long
+    Dim d2 As Long
+    Dim e2 As Long
+    Dim f2 As Long
+    
+    
+    
+   'Primero indicamos de dónde se obtiene el directorio, gestionado desde la hoja de ajustes.
+    directorio = Worksheets("Ajustes").Range("E19").Value
+    
+    'Aquí revisamos que haya al menos una ficha en la carpeta especificada.
+    Set oFSO = CreateObject("Scripting.FileSystemObject")
+    Set oFolder = oFSO.GetFolder(directorio)
+    Set oFiles = oFolder.Files
+    
+    If oFiles.Count = 0 Then
+        MsgBox ("No se encuentra ningún archivo en la carpeta de fichas")
+        Exit Sub
+    End If
+    
+    'En este bloque crearemos una lista de ficahs en un string, en la cual buscaremos en un bloque posterior la ficha correspondiente a cada pieza en el rango indicado, según su número.
+    listaFichas = ""
+    
+    For Each oFile In oFiles
+    
+        ficha = oFile.Name
+        
+        If InStr(ficha, "MUSEO") = 0 Then
+            GoTo SIGUIENTE
+        End If
+        'En este proceso añadiremos una cabecera y un final a cada nombre de ficha, en la cual figurará su número de pieza, para poder manejarlas.
+        closePos = InStr(ficha, "-")
+        fragmento = Mid(ficha, 1, closePos)
+        fragmento = Replace(fragmento, "MUSEO ", "")
+        fragmento = Replace(fragmento, "-", "")
+       
+        
+        listaFichas = listaFichas & "<" & fragmento & ficha & fragmento & ">"
+       
+SIGUIENTE:
+    Next
+    
+
+
+    
+
+'inicializamos algunos valores
+ 
+interruptorSeguridad = False
+ 
+'
+'SCRIPT
+'
+'Hacemos una última comprobación de valores: vemos si hay un número de objeto negativo o si el rango está invertido
+    If inicio <= 0 Then
+        MsgBox "El número inicial debe ser mayor que 0"
+        Exit Sub
+    End If
+    
+    If fin <= 0 Then
+         MsgBox "El número final debe ser mayor que 0"
+        Exit Sub
+    End If
+    
+    If fin < inicio Then
+            'esta comprobacion sería ya innecesaria pues está contemplada en el código del formulario
+         MsgBox "El número inicial debe ser menor que el final"
+        Exit Sub
+    End If
+
+ 
+ If interruptorSeguridad = True Then Exit Sub
+
+ 'Iniciamos un for que repetirá todas estas acciones de principio a fin
+ For counter = inicio To fin
+
+    auxCounter = counter
+                 
+    marcPos = (ObtieneValores(auxCounter, serie)) 'dado que la primera fila es para los títulos de las columnas, comenzamos a "imprimir" la lista a partir de la fila 2 (+1)
+   
+    nPiezaBase = ActiveSheet.Cells(marcPos, 1).Text 'rangoAux.Text
+    
+    nPieza = Replace(nPiezaBase, "/", "")
+    longitud = Len(nPieza)
+   
+    openPos = InStr(listaFichas, "<" & nPieza)
+   
+    closePos = InStr(listaFichas, nPieza & ">")
+    If closePos = 0 Then
+        MsgBox ("No se encuentra la ficha de la pieza" & nPieza)
+        GoTo NO_EXISTE
+    End If
+    fragmento = Mid(listaFichas, openPos + longitud + 1, closePos - openPos - longitud - 1)
+    
+    r1 = "D" & marcPos
+    
+    Link = directorio & "\" & fragmento
+    ActiveSheet.Hyperlinks.Add Anchor:=ActiveSheet.Range(r1), Address:=Link, TextToDisplay:=Link
+                     
+      
+    a = InStr(listaFichas, "<" & nPieza & "a")
+    b = InStr(listaFichas, "<" & nPieza & "b")
+    c = InStr(listaFichas, "<" & nPieza & "c")
+    d = InStr(listaFichas, "<" & nPieza & "d")
+    e = InStr(listaFichas, "<" & nPieza & "e")
+    f = InStr(listaFichas, "<" & nPieza & "f")
+    a2 = InStr(listaFichas, nPieza & "a" & ">")
+    b2 = InStr(listaFichas, nPieza & "b" & ">")
+    c2 = InStr(listaFichas, nPieza & "c" & ">")
+    d2 = InStr(listaFichas, nPieza & "d" & ">")
+    e2 = InStr(listaFichas, nPieza & "e" & ">")
+    f2 = InStr(listaFichas, nPieza & "f" & ">")
+    
+    '    MsgBox (Len(listaFichas))
+    If a > 0 Then
+   ' MsgBox ("A")
+        marcPos = marcPos + 1
+        r1 = "D" & marcPos
+        
+        openPos = a + longitud + 2
+        closePos = a2
+        fragmento = Mid(listaFichas, openPos, closePos - openPos)
+        Link = directorio & "\" & fragmento
+        ActiveSheet.Hyperlinks.Add Anchor:=ActiveSheet.Range(r1), Address:=Link, TextToDisplay:=Link
+    End If
+    
+    
+    If b > 0 Then
+        marcPos = marcPos + 1
+        r1 = "D" & marcPos
+        
+        openPos = b + longitud + 2
+        closePos = b2
+        fragmento = Mid(listaFichas, openPos, closePos - openPos)
+        Link = directorio & "\" & fragmento
+        ActiveSheet.Hyperlinks.Add Anchor:=ActiveSheet.Range(r1), Address:=Link, TextToDisplay:=Link
+    End If
+    
+    If c > 0 Then
+        marcPos = marcPos + 1
+        r1 = "D" & marcPos
+        
+        openPos = c + longitud + 2
+        closePos = c2
+        fragmento = Mid(listaFichas, openPos, closePos - openPos)
+        Link = directorio & "\" & fragmento
+        ActiveSheet.Hyperlinks.Add Anchor:=ActiveSheet.Range(r1), Address:=Link, TextToDisplay:=Link
+    End If
+    
+    If d > 0 Then
+        marcPos = marcPos + 1
+        r1 = "D" & marcPos
+        
+        openPos = d + longitud + 2
+        closePos = d2
+        fragmento = Mid(listaFichas, openPos, closePos - openPos)
+        Link = directorio & "\" & fragmento
+        ActiveSheet.Hyperlinks.Add Anchor:=ActiveSheet.Range(r1), Address:=Link, TextToDisplay:=Link
+    End If
+    
+    If e > 0 Then
+        marcPos = marcPos + 1
+        r1 = "D" & marcPos
+        
+        openPos = e + longitud + 2
+        closePos = e2
+        fragmento = Mid(listaFichas, openPos, closePos - openPos)
+        Link = directorio & "\" & fragmento
+        ActiveSheet.Hyperlinks.Add Anchor:=ActiveSheet.Range(r1), Address:=Link, TextToDisplay:=Link
+    End If
+    
+    If f > 0 Then
+        marcPos = marcPos + 1
+        r1 = "D" & marcPos
+        
+        openPos = f + longitud + 2
+        closePos = f2
+        fragmento = Mid(listaFichas, openPos, closePos - openPos)
+        Link = directorio & "\" & fragmento
+        ActiveSheet.Hyperlinks.Add Anchor:=ActiveSheet.Range(r1), Address:=Link, TextToDisplay:=Link
+    End If
+    
+    a = 0
+    b = 0
+    c = 0
+    d = 0
+    e = 0
+    f = 0
+    a2 = 0
+    b2 = 0
+    c2 = 0
+    d2 = 0
+    e2 = 0
+    f2 = 0
+
+ 
+NO_EXISTE:
+
+ Next counter
+
+    
+End Sub
+
+
+Sub Rango(r1 As Integer, r2 As Integer, serie As String)
+'
+'Rango Macro
+'
+'Hecho a partir de "Sub Borrar" del módulo 2. Permite obtener el rango de casillas entre una pieza y otra, para tener en cuenta los elementos auxiliares.
+'
+    Dim s As Picture
+    Dim cellRange As String
+    Dim CambioIni As String
+    Dim CambioFin As String
+    Dim CeldaIni As Range
+    Dim CeldaFin As Range
+    Dim Fila1 As Integer
+    Dim Fila2 As Integer
+    Dim AuxR1 As Integer
+    Dim AuxR2 As Integer
+    Dim Err As String 'variable auxiliar para MsgBox
+
+    AuxR1 = r1
+    AuxR2 = r2
+
+    'Dado que a veces hay piezas con accesorios, el rango en número de casillas no es simplemente lo que introduce el usuario: es necesario añadir casillas extra.
+    'Por eso generamos primero los identificadores del catalogo correspondientes a las cifras dadas
+    CambioIni = TransNum(AuxR1, serie)
+    CambioFin = TransNum(AuxR2, serie)
+
+'LOG
+'MsgBox CambioIni
+'MsgBox CambioFin
+
+    'Buscamos las celdas en las que se encuentran
+    Set CeldaIni = ActiveSheet.UsedRange.Find(What:=CambioIni, LookAt:=xlWhole)
+    Set CeldaFin = ActiveSheet.UsedRange.Find(What:=CambioFin, LookAt:=xlWhole)
+    
+    If CeldaIni Is Nothing Then
+        Err = "No se encuentra el número de registro inicial " & CambioIni
+        MsgBox Err
+        interruptorSeguridad = True
+        Exit Sub
+    End If
+    If CeldaFin Is Nothing Then
+        Err = "No se encuentra el número de registro final " & CambioFin
+        MsgBox Err
+        interruptorSeguridad = True
+        Exit Sub
+    End If
+
+    'Y extraemos la fila de cada una
+    Fila1 = CeldaIni.Row
+    Fila2 = CeldaFin.Row
+
+    r1 = CInt(Fila1)
+    r2 = CInt(Fila2)
+
+'LOG
+'MsgBox r1
+'MsgBox r2
+
+    cellRange = "C" & r1 & ":" & "C" & r2
+
+'LOG
+'MsgBox cellRange
+
+    'Aquí borramos cada imagen que se encuentre dentro del rango de celdas elegido
+    For Each s In ActiveSheet.Pictures
+        If Not Intersect(Range(cellRange), s.TopLeftCell) Is Nothing Then
+            s.Delete
+        End If
+    Next s
+
+End Sub
+
+'Esta función nos permite obtener el enlace a la carpeta deseada, para manejarlo después como un string.
+Function GetFolder() As String
+    Dim fldr As FileDialog
+    Dim sItem As String
+    Set fldr = Application.FileDialog(msoFileDialogFolderPicker)
+    With fldr
+        .Title = "Select a Folder"
+        .AllowMultiSelect = False
+        .InitialFileName = Application.DefaultFilePath
+        If .Show <> -1 Then GoTo NextCode
+        sItem = .SelectedItems(1)
+    End With
+NextCode:
+    GetFolder = sItem
+    Set fldr = Nothing
+End Function
+
+
+
+
+
