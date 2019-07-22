@@ -1,16 +1,26 @@
-'Creado por Pablo Sanz Martín 2019 para la Biblioteca de la ETSIT UPM
-'
-
 Private Sub CommandButton1_Click()
-'
-'Este script gestiona las acción de hacer click en el formulario dado
-'
+
     
 
     Dim Box1 As Integer
     Dim Box2 As Integer
+    Dim serie1 As String
+    Dim serie2 As String
+   
+    
 
     'En primer lugar comprobamos algunos datos
+    
+    If Worksheets("Ajustes").Range("E9").Value = "" Then
+        MsgBox "No se encuentra carpeta de ICONOS: revisar ajustes"
+        Exit Sub
+    End If
+    If Worksheets("Ajustes").Range("E12").Value = "" Then
+        MsgBox "No se encuentra carpeta de IMÁGENES: revisar ajustes"
+        Exit Sub
+    End If
+    
+    
     If TextBox1 = "" Then
         MsgBox "El número inicial está en blanco"
         Exit Sub
@@ -21,8 +31,18 @@ Private Sub CommandButton1_Click()
     End If
 
     'Dado que se introducen datos String (texto), los transformamos en Integer (números)
-    Box1 = TransText(TextBox1)
-    Box2 = TransText(TextBox2)
+   
+    
+    serie1 = SerieValor(TextBox1)
+    serie2 = SerieValor(TextBox2)
+    
+    If serie1 <> serie2 Then
+        MsgBox "Los elementos pertenecen a series distintas"
+        Exit Sub
+    End If
+  
+    Box1 = TransText(TextBox1, serie1)
+    Box2 = TransText(TextBox2, serie1)
 
     'Estos valores vienen de TransText cuando da error por tipo incorrecto de datos
     If Box1 = 17015 Then
@@ -44,11 +64,16 @@ Private Sub CommandButton1_Click()
         Exit Sub
     Else
         
-    'Llamamos al método que realiza las acciones correspondientes con cada imagen en cada celda
-    Call BuscaImagenes(Box1, Box2)
-    Unload Me 'descargamos las variables antes de salir
- End If
+        'Llamamos al método que realiza las acciones correspondientes con cada imagen en cada celda
+        Call BuscaImagenes(Box1, Box2, serie1)
+        Unload Me 'descargamos las variables antes de salir
+    End If
+   
+
 
 End Sub
 
 
+Private Sub UserForm_Click()
+
+End Sub
